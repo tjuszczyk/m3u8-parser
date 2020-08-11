@@ -8,7 +8,7 @@ import org.junit.Test;
 import static io.lindstrom.m3u8.model.KeyMethod.AES_128;
 import static io.lindstrom.m3u8.model.KeyMethod.NONE;
 import static io.lindstrom.m3u8.model.KeyMethod.SAMPLE_AES;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class SegmentKeyParserTest {
     private SegmentKeyParser parser = new SegmentKeyParser();
@@ -27,9 +27,19 @@ public class SegmentKeyParserTest {
             "KEYFORMAT=\"identity\"," +
             "KEYFORMATVERSIONS=\"1/2/5\"";
 
+    private String attributesWithNoQuotesOnKeyFormatVersion = "METHOD=SAMPLE-AES," +
+            "URI=\"skd://v/1301\"," +
+            "KEYFORMAT=\"com.apple.streamingkeydelivery\"," +
+            "KEYFORMATVERSIONS=1/2/5";
+
     @Test
     public void parseAttributes() throws Exception {
         assertEquals(parser.parse(attributes), key);
+    }
+
+    @Test
+    public void parseKeyFormatVersionWithoutQuotes() throws Exception {
+        assertFalse(parser.parse(attributesWithNoQuotesOnKeyFormatVersion).keyFormatVersions().isPresent());
     }
 
     @Test
