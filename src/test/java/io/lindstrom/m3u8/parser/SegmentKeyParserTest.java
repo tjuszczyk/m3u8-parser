@@ -3,6 +3,7 @@ package io.lindstrom.m3u8.parser;
 import io.lindstrom.m3u8.model.KeyMethod;
 import io.lindstrom.m3u8.model.SegmentKey;
 import io.lindstrom.m3u8.parser.SegmentKeyParser;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 import static io.lindstrom.m3u8.model.KeyMethod.AES_128;
@@ -21,11 +22,23 @@ public class SegmentKeyParserTest {
             .keyFormatVersions("1/2/5")
             .build();
 
+    private SegmentKey keyWithoutKeyFormatVersions = SegmentKey.builder()
+            .method(KeyMethod.AES_128)
+            .uri("https://priv.example.com/key.php?r=53")
+            .iv("0xc055ee9f6c1eb7aa50bfab02b0814972")
+            .keyFormat("identity")
+            .build();
+
     private String attributes = "METHOD=AES-128," +
             "URI=\"https://priv.example.com/key.php?r=53\"," +
             "IV=0xc055ee9f6c1eb7aa50bfab02b0814972," +
             "KEYFORMAT=\"identity\"," +
             "KEYFORMATVERSIONS=\"1/2/5\"";
+
+    private String attributesWithoutKeyFormatVersions = "METHOD=AES-128," +
+            "URI=\"https://priv.example.com/key.php?r=53\"," +
+            "IV=0xc055ee9f6c1eb7aa50bfab02b0814972," +
+            "KEYFORMAT=\"identity\"," ;
 
     private String attributesWithNoQuotesOnKeyFormatVersion = "METHOD=SAMPLE-AES," +
             "URI=\"https://priv.example.com/key.php?r=53\"," +
@@ -38,14 +51,15 @@ public class SegmentKeyParserTest {
     }
 
     @Test
+    public void parseAttributesWithoutKeyFormatVersions() throws Exception {
+        assertEquals(parser.parse(attributesWithoutKeyFormatVersions), keyWithoutKeyFormatVersions);
+    }
+
+    @Test
     public void parseKeyFormatVersionWithoutQuotes() {
-        boolean thrown = false;
-        try {
+        Assertions.assertThatThrownBy(()->{
             parser.parse(attributesWithNoQuotesOnKeyFormatVersion);
-        } catch (PlaylistParserException e) {
-            thrown = true;
-        }
-        assertTrue("keyformatversion is formatted correctly",thrown);
+        }).isInstanceOf(PlaylistParserException.class);
     }
 
     @Test
