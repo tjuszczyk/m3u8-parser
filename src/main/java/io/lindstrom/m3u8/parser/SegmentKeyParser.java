@@ -53,15 +53,17 @@ class SegmentKeyParser extends AbstractLineParser<SegmentKey> {
     }
 
     @Override
-    Map<String, String> parseAttributes(String attributeList) {
+    Map<String, String> parseAttributes(String attributeList) throws PlaylistParserException {
         Matcher matcher = ATTRIBUTE_LIST_PATTERN.matcher(attributeList);
         Map<String, String> attributes = new HashMap<>();
         while (matcher.find()) {
             attributes.put(matcher.group(1), matcher.group(2) != null ? matcher.group(2) : matcher.group(3));
         }
-        Matcher keyFormatVersionMatcher = KEYFORMATVERSION_PATTERN.matcher(attributeList);
-        if (!keyFormatVersionMatcher.find()){
-            attributes.remove("KEYFORMATVERSIONS");
+        if (attributes.containsKey("KEYFORMATVERSIONS")) {
+            Matcher keyFormatVersionMatcher = KEYFORMATVERSION_PATTERN.matcher(attributeList);
+            if (!keyFormatVersionMatcher.find()) {
+                throw new PlaylistParserException("keyformatversions value is not formatted correctly");
+            }
         }
         return attributes;
     }
