@@ -38,7 +38,7 @@ abstract class AbstractLineParser<T> {
 
     abstract String writeAttributes(T value);
 
-    Map<String, String> parseAttributes(String attributeList) {
+    Map<String, String> parseAttributes(String attributeList) throws PlaylistParserException {
         Matcher matcher = ATTRIBUTE_LIST_PATTERN.matcher(attributeList);
         Map<String, String> attributes = new HashMap<>();
         while (matcher.find()) {

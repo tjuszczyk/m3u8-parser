@@ -28,8 +28,8 @@ public class SegmentKeyParserTest {
             "KEYFORMATVERSIONS=\"1/2/5\"";
 
     private String attributesWithNoQuotesOnKeyFormatVersion = "METHOD=SAMPLE-AES," +
-            "URI=\"skd://v/1301\"," +
-            "KEYFORMAT=\"com.apple.streamingkeydelivery\"," +
+            "URI=\"https://priv.example.com/key.php?r=53\"," +
+            "KEYFORMAT=\"identity\"," +
             "KEYFORMATVERSIONS=1/2/5";
 
     @Test
@@ -38,8 +38,14 @@ public class SegmentKeyParserTest {
     }
 
     @Test
-    public void parseKeyFormatVersionWithoutQuotes() throws Exception {
-        assertFalse(parser.parse(attributesWithNoQuotesOnKeyFormatVersion).keyFormatVersions().isPresent());
+    public void parseKeyFormatVersionWithoutQuotes() {
+        boolean thrown = false;
+        try {
+            parser.parse(attributesWithNoQuotesOnKeyFormatVersion);
+        } catch (PlaylistParserException e) {
+            thrown = true;
+        }
+        assertTrue("keyformatversion is formatted correctly",thrown);
     }
 
     @Test
